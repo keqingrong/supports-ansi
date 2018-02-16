@@ -20,8 +20,8 @@ const supportsAnsi = () => {
   // @link https://api.dartlang.org/stable/1.24.3/dart-io/Stdout/supportsAnsiEscapes.html
   const osRelease = os.release().split('.');
   if (
-    parseInt(osRelease[0], 10) >= 10 &&
-    parseInt(osRelease[2], 10) >= 14393
+    parseInt(osRelease[0], 10) >= 10 && // major version
+    parseInt(osRelease[2], 10) >= 14393 // build number
   ) {
     return true;
   }
