@@ -25,8 +25,8 @@
   "author": "keqingrong <keqingrong1992@gmail.com> (https://keqingrong.github.io/)",
   "license": "MIT",
   "dependencies": {
-    "is-cygwin": "^1.0.0",
-    "is-mingw": "^1.0.0",
+    "is-cygwin": "^1.0.1",
+    "is-mingw": "^1.0.1",
     "is-wsl": "^1.1.0"
   }
 }
