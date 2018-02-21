@@ -1,6 +1,6 @@
 {
   "name": "supports-ansi",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Detect whether a terminal supports ANSI escape sequences",
   "main": "index.js",
   "files": [
