@@ -7,7 +7,10 @@ const isWsl = require('is-wsl');
 const env = process.env;
 
 const supportsAnsi = () => {
-  if (!process.stdout.isTTY) {
+  // Check if it is running in the terminal.
+  // NOTE: `process.stdout.isTTY` always return undefined on Cygwin.
+  // @link https://github.com/nodejs/node/issues/3006
+  if (!isCygwin && !process.stdout.isTTY) {
     return false;
   }
 
