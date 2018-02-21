@@ -1,4 +1,5 @@
 'use strict';
+const os = require('os');
 const isCygwin = require('is-cygwin');
 const isMinGW = require('is-mingw');
 const isWsl = require('is-wsl');
