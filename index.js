@@ -2,7 +2,6 @@
 const os = require('os');
 const isCygwin = require('is-cygwin');
 const isMinGW = require('is-mingw');
-const isWsl = require('is-wsl');
 
 const env = process.env;
 
@@ -14,7 +13,11 @@ const supportsAnsi = () => {
     return false;
   }
 
-  // Be natively supported on Unix-like systems.
+  // Be natively supported on Unix-like systems includes WSL.
+  // NOTE: WSL is included with	Windows 10 v.1607 and later. It might be a
+  // problem to use CMD/PowerShell as the terminal with WSL on Windows 10
+  // Insider Preview before v.1607.
+  // @link https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux
   if (process.platform !== 'win32') {
     return true;
   }
@@ -30,8 +33,8 @@ const supportsAnsi = () => {
     return true;
   }
 
-  // Be supported on Cygwin/MinGW(MSYS2)/WSL with Mintty.
-  if (isCygwin || isMinGW || isWsl) {
+  // Be supported on Cygwin/MinGW(MSYS2) with Mintty.
+  if (isCygwin || isMinGW) {
     return true;
   }
 
