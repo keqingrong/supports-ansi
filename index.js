@@ -8,49 +8,57 @@ const env = process.env;
 const supportsAnsi = () => {
   // Check if it is running in the terminal.
   // NOTE: `process.stdout.isTTY` always return undefined on Cygwin.
-  // @link https://github.com/nodejs/node/issues/3006
+  // See https://github.com/nodejs/node/issues/3006
   if (!isCygwin && !process.stdout.isTTY) {
     return false;
   }
 
-  // Be natively supported on Unix-like systems includes WSL.
-  // NOTE: WSL is included with	Windows 10 v.1607 and later. It might be a
-  // problem to use CMD/PowerShell as the terminal with WSL on Windows 10
-  // Insider Preview before v.1607.
-  // @link https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux
-  if (process.platform !== 'win32') {
-    return true;
+  // CMD/PowerShell/Mintty/ConEmu/ANSICON
+  if (process.platform === 'win32') {
+    // Be natively supported on Windows 10 after v.1607 ("Anniversery Update",
+    // OS build 14393).
+    // Reference: https://api.dartlang.org/stable/1.24.3/dart-io/Stdout/supportsAnsiEscapes.html
+    const osRelease = os.release().split('.');
+    if (
+      parseInt(osRelease[0], 10) >= 10 && // major version
+      parseInt(osRelease[2], 10) >= 14393 // build number
+    ) {
+      return true;
+    }
+
+    // Be supported on Cygwin/MinGW(MSYS2) with Mintty.
+    // MinGW and MSYS2 may not create the environment variable `TERM`.
+    if (isCygwin || isMinGW) {
+      return true;
+    }
+
+    // ConEmu (from build 120520d) can process ANSI X3.64 when the environment
+    // variable `ConEmuANSI` is set to `ON`.
+    // See https://conemu.github.io/en/AnsiEscapeCodes.html#Environment_variable
+    const isConEmuAnsiOn = (env.ConEmuANSI || '').toLowerCase() === 'on';
+    if (isConEmuAnsiOn) {
+      return true;
+    }
+
+    // ANSICON provides ANSI escape sequences for Windows console programs. It
+    // will create an `ANSICON` environment variable.
+    // NOTE: ANSICON supports only a subset of ANSI escape sequences.
+    // See https://github.com/adoxa/ansicon/blob/master/ANSI.c#L38
+    if (!!env.ANSICON) {
+      return true;
+    }
   }
 
-  // Be natively supported on Windows 10 after v.1607 ("Anniversery Update",
-  // OS build 14393).
-  // @link https://api.dartlang.org/stable/1.24.3/dart-io/Stdout/supportsAnsiEscapes.html
-  const osRelease = os.release().split('.');
+  // Check if the terminal is of type VT100 compatible.
+  // See http://invisible-island.net/ncurses/man/term.7.html
+  // https://en.wikipedia.org/wiki/Computer_terminal#Dumb_terminals
+  // https://en.m.wikipedia.org/wiki/Comparison_of_terminal_emulators#Capabilities
+  // https://github.com/chalk/supports-color/blob/master/index.js#L105
   if (
-    parseInt(osRelease[0], 10) >= 10 && // major version
-    parseInt(osRelease[2], 10) >= 14393 // build number
+    env.TERM &&
+    env.TERM !== 'dumb' &&
+    /^xterm|^screen|^rxvt|^vt100|^vt102|^vt220|^vt320|color|ansi|konsole|cygwin|linux/i.test(env.TERM)
   ) {
-    return true;
-  }
-
-  // Be supported on Cygwin/MinGW(MSYS2) with Mintty.
-  if (isCygwin || isMinGW) {
-    return true;
-  }
-
-  // ConEmu (from build 120520d) can process ANSI X3.64 when the environment
-  // variable `ConEmuANSI` is set to `ON`.
-  // @link https://conemu.github.io/en/AnsiEscapeCodes.html#Environment_variable
-  const isConEmuAnsiOn = (env.ConEmuANSI || '').toLowerCase() === 'on';
-  if (isConEmuAnsiOn) {
-    return true;
-  }
-
-  // ANSICON provides ANSI escape sequences for Windows console programs. It
-  // will create an `ANSICON` environment variable.
-  // NOTE: ANSICON supports only a subset of ANSI escape sequences.
-  // @link https://github.com/adoxa/ansicon/blob/master/ANSI.c#L38
-  if (!!env.ANSICON) {
     return true;
   }
 
