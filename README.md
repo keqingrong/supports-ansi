@@ -24,6 +24,10 @@ console.log(supportsAnsi);
 // => false
 ```
 
+## Note
+
+Cygwin is not supported.
+
 ## License
 
 MIT

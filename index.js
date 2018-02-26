@@ -1,6 +1,5 @@
 'use strict';
 const os = require('os');
-const isCygwin = require('is-cygwin');
 const isMinGW = require('is-mingw');
 
 const env = process.env;
@@ -9,7 +8,7 @@ const supportsAnsi = () => {
   // Check if it is running in the terminal.
   // NOTE: `process.stdout.isTTY` always return undefined on Cygwin.
   // See https://github.com/nodejs/node/issues/3006
-  if (!isCygwin && !process.stdout.isTTY) {
+  if (!process.stdout.isTTY) {
     return false;
   }
 
@@ -25,9 +24,9 @@ const supportsAnsi = () => {
       return true;
     }
 
-    // Be supported on Cygwin/MinGW(MSYS2) with Mintty.
+    // Be supported on MSYS2/MinGW with Mintty.
     // MinGW and MSYS2 may not create the environment variable `TERM`.
-    if (isCygwin || isMinGW) {
+    if (isMinGW()) {
       return true;
     }
   }
