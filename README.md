@@ -15,7 +15,13 @@ npm install --save supports-ansi
 ```js
 const supportsAnsi = require('supports-ansi');
 
+// on ANSI/VT100 compatible terminal
 console.log(supportsAnsi);
+// => true
+
+// on CMD/PowerShell (before Windows 10 v.1607)
+console.log(supportsAnsi);
+// => false
 ```
 
 ## License

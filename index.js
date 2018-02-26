@@ -13,7 +13,6 @@ const supportsAnsi = () => {
     return false;
   }
 
-  // CMD/PowerShell/Mintty/ConEmu/ANSICON
   if (process.platform === 'win32') {
     // Be natively supported on Windows 10 after v.1607 ("Anniversery Update",
     // OS build 14393).
@@ -31,34 +30,44 @@ const supportsAnsi = () => {
     if (isCygwin || isMinGW) {
       return true;
     }
-
-    // ConEmu (from build 120520d) can process ANSI X3.64 when the environment
-    // variable `ConEmuANSI` is set to `ON`.
-    // See https://conemu.github.io/en/AnsiEscapeCodes.html#Environment_variable
-    const isConEmuAnsiOn = (env.ConEmuANSI || '').toLowerCase() === 'on';
-    if (isConEmuAnsiOn) {
-      return true;
-    }
-
-    // ANSICON provides ANSI escape sequences for Windows console programs. It
-    // will create an `ANSICON` environment variable.
-    // NOTE: ANSICON supports only a subset of ANSI escape sequences.
-    // See https://github.com/adoxa/ansicon/blob/master/ANSI.c#L38
-    if (!!env.ANSICON) {
-      return true;
-    }
   }
 
-  // Check if the terminal is of type VT100 compatible.
-  // See http://invisible-island.net/ncurses/man/term.7.html
-  // https://en.wikipedia.org/wiki/Computer_terminal#Dumb_terminals
-  // https://en.m.wikipedia.org/wiki/Comparison_of_terminal_emulators#Capabilities
-  // https://github.com/chalk/supports-color/blob/master/index.js#L105
+  // Check if the terminal is of type ANSI/VT100/xterm compatible.
+  const pattern = [
+    '^xterm', // xterm, PuTTY, Mintty
+    '^rxvt', // RXVT
+    '^eterm', // Eterm
+    '^screen', // GNU screen, tmux
+    '^tmux', // tmux
+    '^vt100', '^vt102', '^vt220', '^vt320', // DEC VT series
+    'ansi',
+    'cygwin', // Cygwin, MinGW
+    'linux', // Linux console
+    'konsole', // Konsole
+    'bvterm' // Bitvise SSH Client
+  ].join('|');
+  const regex = new RegExp(pattern, 'i');
   if (
     env.TERM &&
     env.TERM !== 'dumb' &&
-    /^xterm|^screen|^rxvt|^vt100|^vt102|^vt220|^vt320|color|ansi|konsole|cygwin|linux/i.test(env.TERM)
+    regex.test(env.TERM)
   ) {
+    return true;
+  }
+
+  // ConEmu (from build 120520d) can process ANSI X3.64 when the environment
+  // variable `ConEmuANSI` is set to `ON`.
+  // See https://conemu.github.io/en/AnsiEscapeCodes.html#Environment_variable
+  const isConEmuAnsiOn = (env.ConEmuANSI || '').toLowerCase() === 'on';
+  if (isConEmuAnsiOn) {
+    return true;
+  }
+
+  // ANSICON provides ANSI escape sequences for Windows console programs. It
+  // will create an `ANSICON` environment variable.
+  // NOTE: ANSICON supports only a subset of ANSI escape sequences.
+  // See https://github.com/adoxa/ansicon/blob/master/ANSI.c#L38
+  if (!!env.ANSICON) {
     return true;
   }
 
