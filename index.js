@@ -24,8 +24,8 @@ const supportsAnsi = () => {
       return true;
     }
 
-    // Be supported on MSYS2/MinGW with Mintty.
-    // MinGW and MSYS2 may not create the environment variable `TERM`.
+    // Be supported on MinGW with Mintty.
+    // MinGW may not create the environment variable `TERM`.
     if (isMinGW()) {
       return true;
     }
@@ -39,7 +39,8 @@ const supportsAnsi = () => {
     '^screen', // GNU screen, tmux
     '^tmux', // tmux
     '^vt100', '^vt102', '^vt220', '^vt320', // DEC VT series
-    'ansi',
+    'ansi', // ANSI
+    'scoansi', // SCO ANSI
     'cygwin', // Cygwin, MinGW
     'linux', // Linux console
     'konsole', // Konsole

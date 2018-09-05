@@ -15,7 +15,7 @@ npm install --save supports-ansi
 ```js
 const supportsAnsi = require('supports-ansi');
 
-// on ANSI/VT100 compatible terminal
+// on ANSI/VT100/xterm compatible terminal
 console.log(supportsAnsi);
 // => true
 
